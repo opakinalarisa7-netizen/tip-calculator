@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор чаевых | Tip Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .calculator-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .calculator-card:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .tip-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .results {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item.total {
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 2px solid #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .result-label {
+            color: #555;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-value {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-card">
+            <h1>💸 Калькулятор чаевых</h1>
+            
+            <div class="input-group">
+                <label>💰 Сумма счета (₽)</label>
+                <input type="number" id="billAmount" placeholder="Например: 2500" value="1500">
+            </div>
+
+            <div class="input-group">
+                <label>👥 Количество человек</label>
+                <input type="number" id="peopleCount" placeholder="Например: 4" value="2" min="1">
+            </div>
+
+            <div class="input-group">
+                <label>🎯 Чаевые: <span id="tipPercentageValue">15</span>%</label>
+                <input type="range" id="tipSlider" min="0" max="30" step="1" value="15">
+                <div class="tip-labels">
+                    <span>0%</span>
+                    <span>10%</span>
+                    <span>15%</span>
+                    <span>20%</span>
+                    <span>30%</span>
+                </div>
+            </div>
+
+            <div class="results">
+                <div class="result-item">
+                    <span class="result-label">💵 Чаевые на человека:</span>
+                    <span class="result-value" id="tipPerPerson">0 ₽</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">🍽️ Общая сумма на человека:</span>
+                    <span class="result-value" id="totalPerPerson">0 ₽</span>
+                </div>
+                <div class="result-item total">
+                    <span class="result-label">🏁 Итоговая сумма (с чаевыми):</span>
+                    <span class="result-value" id="totalBill">0 ₽</span>
+                </div>
+            </div>
+
+            <button id="resetBtn">🔄 Сбросить все</button>
+        </div>
+    </div>
+
+    <script>
+        // Получаем элементы со страницы
+        const billInput = document.getElementById('billAmount');
+        const peopleInput = document.getElementById('peopleCount');
+        const tipSlider = document.getElementById('tipSlider');
+        const tipPercentageSpan = document.getElementById('tipPercentageValue');
+        const tipPerPersonSpan = document.getElementById('tipPerPerson');
+        const totalPerPersonSpan = document.getElementById('totalPerPerson');
+        const totalBillSpan = document.getElementById('totalBill');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Функция для форматирования чисел
+        function formatMoney(value) {
+            return value.toLocaleString('ru-RU', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ' ₽';
+        }
+
+        // Главная функция расчета
+        function calculateTip() {
+            // Получаем значения и преобразуем в числа
+            let bill = parseFloat(billInput.value);
+            let people = parseInt(peopleInput.value);
+            let tipPercent = parseInt(tipSlider.value);
+            
+            // Валидация (проверка на ошибки)
+            if (isNaN(bill) || bill <= 0) {
+                bill = 0;
+                billInput.value = 0;
+            }
+            
+            if (isNaN(people) || people < 1) {
+                people = 1;
+                peopleInput.value = 1;
+            }
+            
+            // Расчеты
+            const totalTip = (bill * tipPercent) / 100;
+            const totalWithTip = bill + totalTip;
+            const tipPerPerson = totalTip / people;
+            const totalPerPerson = totalWithTip / people;
+            
+            // Обновляем отображение процента
+            tipPercentageSpan.textContent = tipPercent;
+            
+            // Обновляем значения на странице
+            tipPerPersonSpan.textContent = formatMoney(tipPerPerson);
+            totalPerPersonSpan.textContent = formatMoney(totalPerPerson);
+            totalBillSpan.textContent = formatMoney(totalWithTip);
+            
+            // Добавляем визуальный эффект
+            [tipPerPersonSpan, totalPerPersonSpan, totalBillSpan].forEach(span => {
+                span.style.animation = 'none';
+                span.offsetHeight;
+                span.style.animation = 'fadeIn 0.3s ease';
+            });
+        }
+
+        // Функция сброса
+        function resetCalculator() {
+            billInput.value = '1500';
+            peopleInput.value = '2';
+            tipSlider.value = '15';
+            calculateTip();
+        }
+
+        // Слушатели событий
+        billInput.addEventListener('input', calculateTip);
+        peopleInput.addEventListener('input', calculateTip);
+        tipSlider.addEventListener('input', calculateTip);
+        resetBtn.addEventListener('click', resetCalculator);
+
+        // Защита от отрицательных чисел
+        billInput.addEventListener('change', function() {
+            if (this.value < 0) this.value = 0;
+            calculateTip();
+        });
+
+        peopleInput.addEventListener('change', function() {
+            if (this.value < 1) this.value = 1;
+            calculateTip();
+        });
+
+        // Первоначальный расчет
+        calculateTip();
+    </script>
+</body>
+</html>
